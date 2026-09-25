@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
+    <application
+        android:name="com.example.ParkALotApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication">
+
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+        <meta-data
+            android:name="distractionOptimized"
+            android:value="true" />
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
+        <meta-data
+            android:name="com.google.android.gms.car.notification.SmallIcon"
+            android:resource="@mipmap/ic_launcher" />
+
+        <activity
+            android:name="com.example.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MyApplication">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Park A Lot Auto (Android Auto Renderer Activity - AABrowser Architecture) -->
+        <activity
+            android:name="com.kspcr.parkalot.auto.ParkALotAutoActivity"
+            android:exported="true"
+            android:label="Park A Lot Auto"
+            android:theme="@style/Theme.MyApplication"
+            android:configChanges="orientation|screenSize|screenLayout|density|smallestScreenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="com.google.android.gms.car.category.CATEGORY_PROJECTION" />
+            </intent-filter>
+            <meta-data
+                android:name="distractionOptimized"
+                android:value="true" />
+        </activity>
+
+        <!-- Park A Lot Auto Media Service (Android Auto Media Capability) -->
+        <service
+            android:name="com.kspcr.parkalot.auto.ParkALotAutoMediaService"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="Park A Lot Auto">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+            <meta-data
+                android:name="distractionOptimized"
+                android:value="true" />
+        </service>
+
+        <!-- Park A Lot Auto Bound IPC Service -->
+        <service
+            android:name="com.kspcr.parkalot.auto.ParkALotAutoService"
+            android:exported="false" />
+
+        <!-- Background Location & Auto Office Detection Service -->
+        <service
+            android:name="com.example.location.BackgroundLocationService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
+        <!-- Park A Lot Auto Broadcast Receiver -->
+        <receiver
+            android:name="com.kspcr.parkalot.auto.ParkALotAutoReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.kspcr.parkalot.auto.ACTION_UPDATE_PARKING_DATA" />
+                <action android:name="com.kspcr.parkalot.auto.ACTION_TRIGGER_TEST_MODE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Android Auto Car App Service -->
+        <service
+            android:name="com.example.automotive.CarAppService"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.POI" />
+            </intent-filter>
+            <meta-data
+                android:name="androidx.car.app.minCarApiLevel"
+                android:value="1" />
+            <meta-data
+                android:name="distractionOptimized"
+                android:value="true" />
+        </service>
+
+        <!-- Charles Background Wake Word Service -->
+        <service
+            android:name="com.example.voice.CharlesWakeWordService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- Geofence Broadcast Receiver -->
+        <receiver
+            android:name="com.example.location.GeofenceBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.parkalot.app.ACTION_GEOFENCE_EVENT" />
+                <action android:name="com.parkalot.app.ACTION_DISMISS_ARRIVAL_NOTIF" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- File Provider for Photo captures -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>
+
